@@ -9,10 +9,13 @@ class MotorEncoder {
     
     int getEnc();
     void resetEnc();
+    void flip();
         
     int channelA;
     int channelB;
     int enc;
+  private:
+    int dir;
         
 };
 void ecount(MotorEncoder* encoder);

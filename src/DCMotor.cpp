@@ -1,10 +1,14 @@
 #include "DCMotor.h"
 
-DCMotor::DCMotor(int pinPWM, int pinA, int pinB) {
+DCMotor::DCMotor(int pinPWM, int pinH1, int pinH2) {
+  pinMode(pinH1, OUTPUT);
+  pinMode(pinH2, OUTPUT);
+   
   this->pinPWM = pinPWM;
-  this->pinA = pinA;
-  this->pinB = pinB;
+  this->pinH1 = pinH1;
+  this->pinH2 = pinH2;
   this->acc = 300;
+  this->dir = 1;
 }
 
 void DCMotor::setMaxAcc(double acc) {
@@ -12,28 +16,33 @@ void DCMotor::setMaxAcc(double acc) {
 }
 
 void DCMotor::setRawSpeed(int pwm) {
+  pwm = constrain(pwm, -255, 255);
   if (pwm < 0)
   {
-    digitalWrite(pinA, LOW);
+    digitalWrite(pinH1, LOW);
     delayMicroseconds(5);
-    digitalWrite(pinB, HIGH);
+    digitalWrite(pinH2, HIGH);
     analogWrite(pinPWM, abs(pwm));
   }
   else
   {
-    digitalWrite(pinA, HIGH);
+    digitalWrite(pinH1, HIGH);
     delayMicroseconds(5);
-    digitalWrite(pinB, LOW);
+    digitalWrite(pinH2, LOW);
     analogWrite(pinPWM, abs(pwm));
   }
   curPWM = pwm;
 }
 
 void DCMotor::setSpeed(int pwm) {
-  this->tarPWM = pwm;
+  this->tarPWM = pwm * dir;
 }
 int DCMotor::getSpeed() {
   return this->curPWM;
+}
+
+void DCMotor::flip() {
+  dir *= -1;
 }
 
 void DCMotor::loop() {
