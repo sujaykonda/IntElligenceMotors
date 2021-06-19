@@ -6,7 +6,7 @@
 class MotorEncoder {
   public:
     MotorEncoder(int channelA, int channelB);
-        
+    
     int getEnc();
     void resetEnc();
         
