@@ -7,15 +7,9 @@ DCMotor::DCMotor(int pinPWM, int pinH1, int pinH2) {
   this->pinPWM = pinPWM;
   this->pinH1 = pinH1;
   this->pinH2 = pinH2;
-  this->acc = 300;
-  this->dir = 1;
 }
 
-void DCMotor::setMaxAcc(double acc) {
-  this->acc = acc;
-}
-
-void DCMotor::setRawSpeed(int pwm) {
+void DCMotor::setPWM(int pwm) {
   pwm = constrain(pwm, -255, 255);
   if (pwm < 0)
   {
@@ -34,22 +28,7 @@ void DCMotor::setRawSpeed(int pwm) {
   curPWM = pwm;
 }
 
-void DCMotor::setSpeed(int pwm) {
-  this->tarPWM = pwm * dir;
-}
-int DCMotor::getSpeed() {
-  return this->curPWM;
-}
-
-void DCMotor::flip() {
-  dir *= -1;
-}
-
-void DCMotor::loop() {
-  int newLoopMs = millis();
-  int maxChange = newLoopMs - this->prevLoopMs;
-  int change = tarPWM - curPWM;
-  int newPWM = curPWM + constrain(change, -maxChange, maxChange);
-  setRawSpeed(newPWM);
-  this->prevLoopMs = newLoopMs;
+int DCMotor::getPWM()
+{
+  return curPWM;
 }

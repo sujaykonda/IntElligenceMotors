@@ -1,24 +1,23 @@
 #include "DCMotor.h"
-#include "MotorEncoder.h"
+#include "DCEncoder.h"
 int elligence;
 
-DCMotor motor(11, 49, 48);
-MotorEncoder encoder(19, 42);
+DCMotor rmotor(11, 49, 48);
+DCEncoder rencoder(19, 42);
+
+DCMotor lmotor(10, 47, 46);
+DCEncoder lencoder(18, 43);
   
 void setup() {
   Serial.begin(9600);
-  attachInterrupt(digitalPinToInterrupt(encoder.channelA), count, RISING);
 }
 
 void loop() {
-  motor.setSpeed(255);
+  rmotor.setPWM(-200);
+  lmotor.setPWM(200);
   while(true) {
-    motor.loop();
-    Serial.println(encoder.getEnc());
+    Serial.print(lencoder.get());
+    Serial.print('\t');
+    Serial.println(rencoder.get());
   }
-  delay(1000000);
-}
-
-void count() {
-  ecount(&encoder);
 }
