@@ -31,7 +31,7 @@ DCEncoder::DCEncoder(int channelA, int channelB)
 
   enc_s += 1;
 
-  attachInterrupt(digitalPinToInterrupt(this->channelA), encoderChange, CHANGE);
+  //attachInterrupt(digitalPinToInterrupt(this->channelA), encoderChange, CHANGE);
 }
 
 int DCEncoder::get()

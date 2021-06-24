@@ -1,34 +1,53 @@
-#include "DCEncoderModer.h"
+#include "DCEncoderMotor.h"
 
-DCEncoderMotor::DCEncoderMotor(int pinPWM, int pinH1, int pinH2, int channelA, int channelB) : motor(pinPWM, pinH1, pinH2), encoder(channelA, channelB), pid(0, 0, 0) {}
+DCEncoderMotor::DCEncoderMotor(int pinPWM, int pinH1, int pinH2, int channelA, int channelB, MotorGain GAIN) : motor(pinPWM, pinH1, pinH2), encoder(channelA, channelB), pid(0, 0, 0) {
+  this->prevTime = -1;
+  this->GAIN = GAIN;
+}
+
+void DCEncoderMotor::count() {
+  encoder.count();
+}
 
 void DCEncoderMotor::setPWM(int pwm) {
-    motor.setPWM(pwm);
+  motor.setPWM(pwm);
 }
 
 void DCEncoderMotor::setTarEPS(double eps) {
-    tarEPS = eps;
+  tarEPS = eps/1000.0;
 
-    mode = SET_SPEED;
+  mode = SET_SPEED;
+  
+  pid.setConstants(this->GAIN * 2, this->GAIN * 0, this->GAIN * 2);
+  pid.reset();
+  
+  prevSpeed = 100 * eps/fabs(eps);
+  motor.setPWM(prevSpeed);
 
-    pid.setConstants(eps/100.0, eps/100000.0, eps/100.0);
+  prevPos = 0;
 }
 
 void DCEncoderMotor::setTarPos(int pos) {
-    tarPos = pos;
+  tarPos = pos;
 
-    mode = GO_TO_POS;
+  mode = GO_TO_POS;
 }
 
 void DCEncoderMotor::loop() {
-    double curPos = encoder.get();
-    int curTime = millis();
-    if(mode == SET_SPEED) {
-        double curEPS = (curPos - prevPos) / (curTime - prevTime);
-        motor.setPWM(motor.getPWM() + pid.loop(tarEPS - curEPS));
+  long curTime = millis();
+  double curPos = encoder.get();
+  if (curTime - prevTime > 0) {
+    if (mode == SET_SPEED) {
+      double curEPS = (curPos - prevPos) / (curTime - prevTime);
+      double error = tarEPS - curEPS;
+      double adjust = pid.loop(error);
+      Serial.println(error * 1000.0);
+      //Serial.println(curPos);
+      prevSpeed -= adjust;
+      //Serial.println(prevSpeed);
+      motor.setPWM(prevSpeed);
     }
-    prevPos = curPos;
+    prevPos = encoder.get();
     prevTime = curTime;
+  }
 }
-
-

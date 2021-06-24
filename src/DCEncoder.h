@@ -5,9 +5,6 @@
 
 void encoderChange();
 
-extern DCEncoder *encoders[100];
-extern int enc_s;
-
 class DCEncoder
 {
 public:
@@ -25,5 +22,9 @@ public:
 
 private:
 };
+
+extern DCEncoder *encoders[100];
+extern int enc_s;
+
 
 #endif
